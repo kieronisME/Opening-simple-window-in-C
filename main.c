@@ -75,8 +75,7 @@ int main (){
         HGLRC dummy_gl_context = wglCreateContext(dummy_device_context);
         wglMakeCurrent(dummy_device_context, dummy_gl_context);
 
-
-        wglChoosePixelFormatARB    = (wglChoosePixelFormatARB_func*)wglGetProcAddress("wglCreateContextAttribsARB");
+        wglChoosePixelFormatARB    = (wglChoosePixelFormatARB_func*)wglGetProcAddress("wglChoosePixelFormatARB");
         wglCreateContextAttribsARB = (wglCreateContextAttribsARB_func*)wglGetProcAddress("wglCreateContextAttribsARB");
 
         int32_t piAttribIList[] = {
@@ -105,7 +104,7 @@ int main (){
 
     //REAL WINDOW CLASS
     WNDCLASS real_wnd_class  = {
-        .lpfnWndProc         = DefWindowProcW,
+        .lpfnWndProc         = window_proc,
         .hInstance           = module_handle,
         .hCursor             = LoadCursorW(0, IDC_ARROW),
         .lpszClassName       = REAL_WND_NAME
@@ -130,6 +129,7 @@ int main (){
     HDC real_dc               = GetDC(real_window_config);
     PIXELFORMATDESCRIPTOR pdf = {0};
     DescribePixelFormat(real_dc, pixel_format,sizeof(PIXELFORMATDESCRIPTOR), &pdf);
+    SetPixelFormat(real_dc, pixel_format, &pdf);
 
     int32_t context_attribs[] = {
         WGL_CONTEXT_MAJOR_VERSION_ARB, 4,
@@ -139,9 +139,9 @@ int main (){
 
     HGLRC real_gl_context = wglCreateContextAttribsARB(real_dc, NULL, context_attribs);
     wglMakeCurrent(real_dc, real_gl_context);
-    
     ShowWindow(real_window_config, SW_SHOW);
 
+    glClearColor(0, 0.2, 0.2, 1.0);
 
     while(!should_window_close){
         MSG message = {0};
@@ -150,6 +150,10 @@ int main (){
             DispatchMessage(&message);
 
         }
+        glClear(GL_COLOR_BUFFER_BIT);
+
+
+
         SwapBuffers(real_dc);
     };
 
